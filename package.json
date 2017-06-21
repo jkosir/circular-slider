@@ -8,6 +8,7 @@
     "event-stream": "^3.3.4",
     "gulp": "^3.6.2",
     "gulp-connect": "^5.0.0",
+    "gulp-copy": "^1.0.0",
     "gulp-inject": "^4.2.0",
     "gulp-livereload": "^3.8.1",
     "gulp-shell": "^0.4.2",
