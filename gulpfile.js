@@ -41,12 +41,13 @@ gulp.task('build', function () {
     .pipe(tsc({
       module: "commonjs",
       emitError: false
-    }));
+    }))
+    .pipe(gulp.dest('./app/build'));
 
   var css = gulp.src(['./app/src/**/*.css'], {read: false});
 
   return gulp.src('./app/src/index.html')
-    .pipe(inject(es.merge(ts, css), {cwd: __dirname + '/app/src'}))
+    .pipe(inject(es.merge(gulp.src('./app/build/**/*.js'), css), {ignorePath: '/app/build/'}))
     .pipe(gulp.dest('./app/build'))
     .pipe(livereload());
 });
