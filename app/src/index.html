@@ -6,8 +6,8 @@
   <!-- endinject -->
 </head>
 <body>
-<div class="centered">
-  <div class="wheel">
+<div class="centered" id="container">
+  <div class="wheel" id="wheel">
     <div class="wheel-progress"></div>
     <div class="wheel-center">
       <span class="wheel-value"></span>
@@ -18,11 +18,5 @@
 
 <!-- inject:js -->
 <!-- endinject -->
-<script type="text/javascript">
-  var App = require("./app");
-  var greeter = new App.Controller("Whatup");
-  greeter.greet();
-
-</script>
 </body>
 </html>

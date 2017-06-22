@@ -1,55 +1,56 @@
-/**
- * An output capable of recieving a string message for display.
- */
-export interface StringDisplay {
-  display(msg : string) : void;
+interface Options {
+  color: string,
+  max: number,
+  min: number,
+  step: number,
+  radius: number
 }
 
-/**
- * Instance is an App controller. Automatically creates 
- * model. Creates view if none given.
- */
-export class Controller {
-  private model : Model;
-  private view  : View ;
+class Slider {
+  container: HTMLElement;
+  handle: HTMLElement;
+  options: Options;
+  mousedown: boolean;
+  wheelBounds: ClientRect;
+  handleBounds: ClientRect;
 
-  constructor (greeting: string, view?: View) {
-    this.model = new Model(greeting);
-    this.view  = (view  || new View());
+  constructor({container, color = '#ff0000', max = 100, min = 0, step = 1, radius = 100}:{container: HTMLElement, color?: string, max?: number, min?: number, step?: number, radius?: number}) {
+    this.options = {
+      color: color,
+      max: max,
+      min: min,
+      step: step,
+      radius: radius
+    };
+
+    this.container = container;
+    this.wheelBounds = container.getBoundingClientRect();
+    this.handle = <HTMLElement>this.container.getElementsByClassName('wheel-handle')[0];
+    this.handleBounds = this.handle.getBoundingClientRect();
+    this.mousedown = false;
+
+    this.setListeners()
+
   }
 
-  public greet () : void {
-    this.view.display (this.model.getGreeting());
+  setListeners() {
+    this.handle.addEventListener('mousedown', () => this.mousedown = true);
+    window.addEventListener('mouseup', () => this.mousedown = false);
+
+    document.addEventListener('mousemove', (ev) => {
+      if (!this.mousedown) return;
+      ev.preventDefault();
+
+      let dX = ev.pageX - (this.wheelBounds.left + this.wheelBounds.width / 2);
+      let dY = ev.pageY - (this.wheelBounds.top + this.wheelBounds.height / 2);
+      let rad = Math.atan2(dY, dX);
+
+      let radius_minus_handle = (this.wheelBounds.width - this.handleBounds.width) / 2;
+      this.handle.style.left = Math.cos(rad) * radius_minus_handle + (this.wheelBounds.width / 2) + 'px';
+      this.handle.style.top = Math.sin(rad) * radius_minus_handle + (this.wheelBounds.height / 2) + 'px';
+
+
+    })
   }
 }
 
-/**
- * Private class. Instance represents a greeting to the world.
- */
-class Model {
-  private greeting : string;
-
-  constructor (greeting : string) {
-    this.greeting = greeting;
-  }
-
-  public getGreeting() : string {
-    return this.greeting + ", world!";
-  }
-}
-
-/**
- * Instance is a message logger; outputs messages to console.
- */
-export class View implements StringDisplay {
-  public display (msg : string) : void {
-    console.log(msg);
-  }
-}
-
-/*
- * Factory function. Returns a default first app.
- */
-export function defaultGreeter(view? : StringDisplay) {
-  return new Controller("Hello", view);
-}
