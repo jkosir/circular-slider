@@ -16,7 +16,7 @@ var paths = {
   all_src: 'app/src/**/*.*'
 };
 
-gulp.task('default', ['build', 'copycss', 'webserver', 'watch']);
+gulp.task('default', ['copycss', 'build', 'webserver', 'watch']);
 
 // ** Running ** //
 
@@ -44,7 +44,7 @@ gulp.task('build', function () {
     }))
     .pipe(gulp.dest('./app/build'));
 
-  var css = gulp.src(['./app/src/**/*.css'], {read: false});
+  var css = gulp.src(['./app/build/**/*.css'], {read: false});
 
   return gulp.src('./app/src/index.html')
     .pipe(inject(es.merge(gulp.src('./app/build/**/*.js'), css), {ignorePath: '/app/build/'}))
