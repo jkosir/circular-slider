@@ -15,9 +15,10 @@ class Slider {
   mousedown: boolean;
   wheelBounds: ClientRect;
   handleBounds: ClientRect;
+  wheelId = `wheel_${document.getElementsByClassName("wheel").length}`;
 
   wheelTemplate = `
-<div class="wheel" id="wheel">
+<div class="wheel" id="${this.wheelId}">
     <div class="wheel-progress">
       <svg width="200" height="200">
         <path class="wheel-progress-fill"></path>
@@ -54,9 +55,9 @@ class Slider {
   }
 
   insertWheel(radius) {
-    this.container.innerHTML = this.wheelTemplate;
+    this.container.insertAdjacentHTML('beforeend', this.wheelTemplate);
 
-    this.wheel = <HTMLElement>this.container.getElementsByClassName('wheel')[0];
+    this.wheel = document.getElementById(this.wheelId);
     this.wheel.style.width = `${2 * radius}px`;
     this.wheel.style.height = `${2 * radius}px`;
     this.wheel.style.borderRadius = `${radius}px`;
@@ -71,11 +72,11 @@ class Slider {
     wheelCenter.style.height = `${2 * radius - 40}px`;
     wheelCenter.style.borderRadius = `${radius - 20}px`;
 
-    this.handle = <HTMLElement>this.container.getElementsByClassName('wheel-handle')[0];
+    this.handle = <HTMLElement>this.wheel.getElementsByClassName('wheel-handle')[0];
     this.handle.style.backgroundColor = this.options.color;
     this.handleBounds = this.handle.getBoundingClientRect();
 
-    this.arc = <HTMLElement>this.container.getElementsByClassName('wheel-progress-fill')[0];
+    this.arc = <HTMLElement>this.wheel.getElementsByClassName('wheel-progress-fill')[0];
     let rgbColor = this.hexToRgb(this.options.color);
     this.arc.style.stroke = `rgba(${rgbColor.r},${rgbColor.g},${rgbColor.b},0.5)`
   }
