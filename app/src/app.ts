@@ -53,7 +53,7 @@ class Slider {
     window.addEventListener('mousemove', this.update);
   }
 
-  insertWheel(radius){
+  insertWheel(radius) {
     this.container.innerHTML = this.wheelTemplate;
 
     this.wheel = <HTMLElement>this.container.getElementsByClassName('wheel')[0];
@@ -72,8 +72,12 @@ class Slider {
     wheelCenter.style.borderRadius = `${radius - 20}px`;
 
     this.handle = <HTMLElement>this.container.getElementsByClassName('wheel-handle')[0];
+    this.handle.style.backgroundColor = this.options.color;
     this.handleBounds = this.handle.getBoundingClientRect();
+
     this.arc = <HTMLElement>this.container.getElementsByClassName('wheel-progress-fill')[0];
+    let rgbColor = this.hexToRgb(this.options.color);
+    this.arc.style.stroke = `rgba(${rgbColor.r},${rgbColor.g},${rgbColor.b},0.5)`
   }
 
   update = (ev: MouseEvent) => {
@@ -106,6 +110,15 @@ class Slider {
       deg
     ));
   };
+
+  hexToRgb(hex) {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+  }
 
 
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {
