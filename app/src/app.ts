@@ -31,45 +31,48 @@ class Slider {
     this.mousedown = false;
 
     this.arc = <HTMLElement>this.container.getElementsByClassName('wheel-progress-fill')[0];
-    this.setListeners();
 
-  }
-
-  setListeners() {
-    this.handle.addEventListener('mousedown', () => this.mousedown = true);
-    window.addEventListener('mouseup', () => this.mousedown = false);
-
-    document.addEventListener('mousemove', (ev) => {
-      if (!this.mousedown) return;
+    this.handle.addEventListener('mousedown', (ev) => {
+      this.mousedown = true;
       ev.preventDefault();
-
-      let dX = ev.pageX - (this.wheelBounds.left + this.wheelBounds.width / 2);
-      let dY = ev.pageY - (this.wheelBounds.top + this.wheelBounds.height / 2);
-      let rad = Math.atan2(dY, dX);
-
-      let radius_minus_handle = (this.wheelBounds.width - this.handleBounds.width) / 2;
-      this.handle.style.left = Math.cos(rad) * radius_minus_handle + (this.wheelBounds.width / 2) + 'px';
-      this.handle.style.top = Math.sin(rad) * radius_minus_handle + (this.wheelBounds.height / 2) + 'px';
-
-      let deg = rad * (180 / Math.PI);
-      // Convert radians to degrees relative to positive y-axis
-      if (deg <= 0 && deg >= -90) {
-        deg = 90 + deg;
-      } else if (deg < -90) {
-        deg = 270 + 180 + deg;
-      } else {
-        deg += 90;
-      }
-
-      this.arc.setAttribute('d', this.describeArc(
-        100,
-        100,
-        90,
-        0,
-        deg
-      ));
-    })
+      this.handle.focus();
+    });
+    window.addEventListener('mouseup', () => this.mousedown = false);
+    window.addEventListener('mousemove', this.update);
   }
+
+  update = (ev: MouseEvent) => {
+    if (!this.mousedown) return;
+    ev.preventDefault();
+
+    let dX = ev.pageX - (this.wheelBounds.left + this.wheelBounds.width / 2);
+    let dY = ev.pageY - (this.wheelBounds.top + this.wheelBounds.height / 2);
+    let rad = Math.atan2(dY, dX);
+
+    let radius_minus_handle = (this.wheelBounds.width - this.handleBounds.width) / 2;
+    this.handle.style.left = Math.cos(rad) * radius_minus_handle + (this.wheelBounds.width / 2) + 'px';
+    this.handle.style.top = Math.sin(rad) * radius_minus_handle + (this.wheelBounds.height / 2) + 'px';
+
+    let deg = rad * (180 / Math.PI);
+    // Convert radians to degrees relative to positive y-axis
+    if (deg <= 0 && deg >= -90) {
+      deg = 90 + deg;
+    } else if (deg < -90) {
+      deg = 270 + 180 + deg;
+    } else {
+      deg += 90;
+    }
+
+    this.arc.setAttribute('d', this.describeArc(
+      100,
+      100,
+      90,
+      0,
+      deg
+    ));
+  };
+
+
 
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     let angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;

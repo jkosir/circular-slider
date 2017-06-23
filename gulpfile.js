@@ -25,7 +25,7 @@ gulp.task('default', ['copycss', 'build', 'webserver', 'watch']);
 
 gulp.task('watch', function () {
   livereload.listen();
-  gulp.watch(paths.all_src, ['build']);
+  gulp.watch(paths.all_src, ['copycss', 'build']);
 });
 
 // ** Compilation ** //
