@@ -8,12 +8,26 @@ interface Options {
 
 class Slider {
   container: HTMLElement;
+  wheel: HTMLElement;
   handle: HTMLElement;
   arc: HTMLElement;
   options: Options;
   mousedown: boolean;
   wheelBounds: ClientRect;
   handleBounds: ClientRect;
+
+  wheelTemplate = `
+<div class="wheel" id="wheel">
+    <div class="wheel-progress">
+      <svg width="200" height="200">
+        <path class="wheel-progress-fill"></path>
+      </svg>
+    </div>
+    <div class="wheel-center">
+      <span class="wheel-value"></span>
+    </div>
+    <a href="javascript:void(0)" class="wheel-handle"></a>
+  </div>`;
 
   constructor({container, color = '#ff0000', max = 100, min = 0, step = 1, radius = 100}:{container: HTMLElement, color?: string, max?: number, min?: number, step?: number, radius?: number}) {
     this.options = {
@@ -24,14 +38,12 @@ class Slider {
       radius: radius
     };
 
-    this.container = container;
-    this.wheelBounds = container.getBoundingClientRect();
-    this.handle = <HTMLElement>this.container.getElementsByClassName('wheel-handle')[0];
-    this.handleBounds = this.handle.getBoundingClientRect();
     this.mousedown = false;
+    this.container = container;
+    this.insertWheel(radius);
 
-    this.arc = <HTMLElement>this.container.getElementsByClassName('wheel-progress-fill')[0];
 
+    /* Set listeners */
     this.handle.addEventListener('mousedown', (ev) => {
       this.mousedown = true;
       ev.preventDefault();
@@ -39,6 +51,29 @@ class Slider {
     });
     window.addEventListener('mouseup', () => this.mousedown = false);
     window.addEventListener('mousemove', this.update);
+  }
+
+  insertWheel(radius){
+    this.container.innerHTML = this.wheelTemplate;
+
+    this.wheel = <HTMLElement>this.container.getElementsByClassName('wheel')[0];
+    this.wheel.style.width = `${2 * radius}px`;
+    this.wheel.style.height = `${2 * radius}px`;
+    this.wheel.style.borderRadius = `${radius}px`;
+    this.wheelBounds = this.wheel.getBoundingClientRect();
+
+    let svg = this.wheel.getElementsByTagName('svg')[0];
+    svg.style.width = `${2 * radius}px`;
+    svg.style.height = `${2 * radius}px`;
+
+    let wheelCenter = <HTMLElement>this.wheel.getElementsByClassName('wheel-center')[0];
+    wheelCenter.style.width = `${2 * radius - 40}px`;
+    wheelCenter.style.height = `${2 * radius - 40}px`;
+    wheelCenter.style.borderRadius = `${radius - 20}px`;
+
+    this.handle = <HTMLElement>this.container.getElementsByClassName('wheel-handle')[0];
+    this.handleBounds = this.handle.getBoundingClientRect();
+    this.arc = <HTMLElement>this.container.getElementsByClassName('wheel-progress-fill')[0];
   }
 
   update = (ev: MouseEvent) => {
@@ -64,14 +99,13 @@ class Slider {
     }
 
     this.arc.setAttribute('d', this.describeArc(
-      100,
-      100,
-      90,
+      this.options.radius,
+      this.options.radius,
+      this.options.radius - 10,
       0,
       deg
     ));
   };
-
 
 
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {

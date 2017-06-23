@@ -39,9 +39,6 @@ body {
 }
 
 .wheel {
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
   background-color: lightgray;
   position: relative;
 }
@@ -64,13 +61,10 @@ body {
   text-align: center;
   white-space: nowrap;
   background-color: white;
-  border-radius: 80px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  height: 160px;
   left: 20px;
   position: relative;
   top: 20px;
-  width: 160px;
 }
 
 .wheel .wheel-center:before {
@@ -96,7 +90,7 @@ body {
 }
 
 .wheel .wheel-progress:after {
-  border-radius: 100px;
+  border-radius: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) inset;
   content: "";
   display: block;
