@@ -8,8 +8,9 @@ var Slider = (function () {
             if (!_this.mousedown)
                 return;
             ev.preventDefault();
-            var dX = ev.pageX - (_this.wheelBounds.left + _this.wheelBounds.width / 2);
-            var dY = ev.pageY - (_this.wheelBounds.top + _this.wheelBounds.height / 2);
+            var evParsed = _this.handleMouseTouch(ev);
+            var dX = evParsed.pageX - (_this.wheelBounds.left + _this.wheelBounds.width / 2);
+            var dY = evParsed.pageY - (_this.wheelBounds.top + _this.wheelBounds.height / 2);
             var rad = Math.atan2(dY, dX);
             var radius_minus_handle = (_this.wheelBounds.width - _this.handleBounds.width) / 2;
             _this.handle.style.left = Math.cos(rad) * radius_minus_handle + (_this.wheelBounds.width / 2) + 'px';
@@ -58,7 +59,7 @@ var Slider = (function () {
                 for (var _i = 0, _a = Slider.wheelsRegistry; _i < _a.length; _i++) {
                     var wheel = _a[_i];
                     if (_this.isClickWithinClientRect(ev, wheel.handleBounds)) {
-                        wheel.handle.dispatchEvent(new Event('mousedown'));
+                        wheel.handle.dispatchEvent(ev.type === 'touchstart' ? new Event('touchstart') : new Event('mousedown'));
                         ev.stopPropagation();
                     }
                 }
@@ -114,6 +115,18 @@ var Slider = (function () {
         this.arc.style.stroke = "rgba(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ",0.5)";
     };
     /* Util functions */
+    Slider.prototype.handleMouseTouch = function (ev) {
+        var pageX, pageY;
+        if (ev.touches) {
+            pageX = ev.touches[0].pageX;
+            pageY = ev.touches[0].pageY;
+        }
+        else {
+            pageX = ev.pageX;
+            pageY = ev.pageY;
+        }
+        return { pageX: pageX, pageY: pageY };
+    };
     Slider.prototype.hexToRgb = function (hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
@@ -130,13 +143,15 @@ var Slider = (function () {
         };
     };
     Slider.prototype.isClickWithinClientRect = function (ev, rect) {
-        var xWithin = rect.left <= ev.clientX && ev.clientX <= (rect.left + rect.width);
-        var yWithin = rect.top <= ev.clientY && ev.clientY <= (rect.top + rect.height);
+        var evParsed = this.handleMouseTouch(ev);
+        var xWithin = rect.left <= evParsed.pageX && evParsed.pageX <= (rect.left + rect.width);
+        var yWithin = rect.top <= evParsed.pageY && evParsed.pageY <= (rect.top + rect.height);
         return xWithin && yWithin;
     };
     Slider.prototype.isClickInWheelArc = function (ev, wheel) {
-        var dX = ev.clientX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
-        var dY = ev.clientY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
+        var evParsed = this.handleMouseTouch(ev);
+        var dX = evParsed.pageX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
+        var dY = evParsed.pageY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
         var fromCenter = Math.sqrt(dX * dX + dY * dY);
         return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20);
     };
