@@ -168,7 +168,6 @@ class Slider {
     let dX = ev.clientX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
     let dY = ev.clientY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
     let fromCenter = Math.sqrt(dX * dX + dY * dY);
-    console.log(fromCenter, fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20))
     return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20)
   }
 
