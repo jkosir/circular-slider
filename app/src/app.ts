@@ -16,6 +16,7 @@ class Slider {
   wheelBounds: ClientRect;
   handleBounds: ClientRect;
   wheelId = `wheel_${document.getElementsByClassName("wheel").length}`;
+  static wheelsRegistry = [];
 
   wheelTemplate = `
 <div class="wheel" id="${this.wheelId}">
@@ -42,7 +43,28 @@ class Slider {
     this.mousedown = false;
     this.container = container;
     this.insertWheel(radius);
+    Slider.wheelsRegistry.push(this);
 
+    // Window listeners, so we can dispatch events correctly
+    window.addEventListener('mousedown', (ev: MouseEvent) => {
+      for (let wheel of Slider.wheelsRegistry) {
+        if (this.isClickWithinClientRect(ev, wheel.handleBounds)) {
+          wheel.handle.dispatchEvent(new Event('mousedown'));
+          ev.stopPropagation();
+        }
+      }
+    });
+
+    window.addEventListener('click', (ev: MouseEvent) => {
+      for (let wheel of Slider.wheelsRegistry) {
+        if (this.isClickInWheelArc(ev, wheel)) {
+          wheel.mousedown = true;
+          wheel.update(ev);
+          wheel.mousedown = false;
+          ev.stopPropagation();
+        }
+      }
+    });
 
     /* Set listeners */
     this.handle.addEventListener('mousedown', (ev) => {
@@ -110,7 +132,12 @@ class Slider {
       0,
       deg
     ));
+    // Update bounds
+    this.wheelBounds = this.wheel.getBoundingClientRect();
+    this.handleBounds = this.handle.getBoundingClientRect();
   };
+
+  /* Util functions */
 
   hexToRgb(hex) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -129,6 +156,20 @@ class Slider {
       x: centerX + (radius * Math.cos(angleInRadians)),
       y: centerY + (radius * Math.sin(angleInRadians))
     };
+  }
+
+  isClickWithinClientRect(ev: MouseEvent, rect: ClientRect) {
+    let xWithin = rect.left <= ev.clientX && ev.clientX <= (rect.left + rect.width);
+    let yWithin = rect.top <= ev.clientY && ev.clientY <= (rect.top + rect.height);
+    return xWithin && yWithin
+  }
+
+  isClickInWheelArc(ev: MouseEvent, wheel: Slider) {
+    let dX = ev.clientX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
+    let dY = ev.clientY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
+    let fromCenter = Math.sqrt(dX * dX + dY * dY);
+    console.log(fromCenter, fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20))
+    return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20)
   }
 
   // Ref: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
