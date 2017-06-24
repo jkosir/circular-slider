@@ -54,7 +54,7 @@ class Slider {
       window.addEventListener(event, (ev: MouseEvent| TouchEvent) => {
         for (let wheel of Slider.wheelsRegistry) {
           if (this.isClickWithinClientRect(ev, wheel.handleBounds)) {
-            wheel.handle.dispatchEvent(ev.type==='touchstart' ? new Event('touchstart'): new Event('mousedown'));
+            wheel.handle.dispatchEvent(ev.type === 'touchstart' ? new Event('touchstart') : new Event('mousedown'));
             ev.stopPropagation();
           }
         }
@@ -88,6 +88,11 @@ class Slider {
     ['mousemove', 'touchmove'].forEach((event) => {
       window.addEventListener(event, this.update);
     });
+    window.addEventListener('scroll', (ev) => {
+      // Update bounds
+      this.wheelBounds = this.wheel.getBoundingClientRect();
+      this.handleBounds = this.handle.getBoundingClientRect();
+    })
   }
 
   insertWheel(radius) {
@@ -122,9 +127,8 @@ class Slider {
     ev.preventDefault();
     let evParsed = this.handleMouseTouch(ev);
 
-
-    let dX = evParsed.pageX - (this.wheelBounds.left + this.wheelBounds.width / 2);
-    let dY = evParsed.pageY - (this.wheelBounds.top + this.wheelBounds.height / 2);
+    let dX = evParsed.pageX - (window.pageXOffset + this.wheelBounds.left + this.wheelBounds.width / 2);
+    let dY = evParsed.pageY - (window.pageYOffset + this.wheelBounds.top + this.wheelBounds.height / 2);
     let rad = Math.atan2(dY, dX);
 
     let radius_minus_handle = (this.wheelBounds.width - this.handleBounds.width) / 2;
@@ -198,16 +202,17 @@ class Slider {
   }
 
   isClickWithinClientRect(ev: MouseEvent|TouchEvent, rect: ClientRect) {
+    console.log(ev, rect);
     let evParsed = this.handleMouseTouch(ev);
-    let xWithin = rect.left <= evParsed.pageX && evParsed.pageX <= (rect.left + rect.width);
-    let yWithin = rect.top <= evParsed.pageY && evParsed.pageY <= (rect.top + rect.height);
+    let xWithin = (window.pageXOffset + rect.left) <= evParsed.pageX && evParsed.pageX <= (window.pageXOffset + rect.left + rect.width);
+    let yWithin = (window.pageYOffset + rect.top) <= evParsed.pageY && evParsed.pageY <= (window.pageYOffset + rect.top + rect.height);
     return xWithin && yWithin
   }
 
   isClickInWheelArc(ev: MouseEvent|TouchEvent, wheel: Slider) {
     let evParsed = this.handleMouseTouch(ev);
-    let dX = evParsed.pageX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
-    let dY = evParsed.pageY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
+    let dX = evParsed.pageX - (window.pageXOffset + wheel.wheelBounds.left) - wheel.wheelBounds.width / 2;
+    let dY = evParsed.pageY - (window.pageYOffset + wheel.wheelBounds.top) - wheel.wheelBounds.height / 2;
     let fromCenter = Math.sqrt(dX * dX + dY * dY);
     return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20)
   }
