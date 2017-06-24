@@ -107,5 +107,9 @@ body {
   fill: none;
   stroke-width: 20;
 }
-
+.slider-value {
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 4px;
+}
 /*# sourceMappingURL=main.css.map */

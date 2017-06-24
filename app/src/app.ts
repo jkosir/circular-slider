@@ -138,7 +138,7 @@ class Slider {
     ));
 
     // Calculate new value
-    let newValue = deg * (this.options.max - this.options.min) / 360;
+    let newValue = this.options.min + deg * (this.options.max - this.options.min) / 360;
     let rounded = Math.ceil(newValue / this.options.step) * this.options.step;
     if (Math.abs(rounded - this.value) >= this.options.step) {
       this.value = rounded;
