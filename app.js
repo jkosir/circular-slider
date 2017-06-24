@@ -9,8 +9,8 @@ var Slider = (function () {
                 return;
             ev.preventDefault();
             var evParsed = _this.handleMouseTouch(ev);
-            var dX = evParsed.pageX - (_this.wheelBounds.left + _this.wheelBounds.width / 2);
-            var dY = evParsed.pageY - (_this.wheelBounds.top + _this.wheelBounds.height / 2);
+            var dX = evParsed.pageX - (window.pageXOffset + _this.wheelBounds.left + _this.wheelBounds.width / 2);
+            var dY = evParsed.pageY - (window.pageYOffset + _this.wheelBounds.top + _this.wheelBounds.height / 2);
             var rad = Math.atan2(dY, dX);
             var radius_minus_handle = (_this.wheelBounds.width - _this.handleBounds.width) / 2;
             _this.handle.style.left = Math.cos(rad) * radius_minus_handle + (_this.wheelBounds.width / 2) + 'px';
@@ -92,6 +92,11 @@ var Slider = (function () {
         ['mousemove', 'touchmove'].forEach(function (event) {
             window.addEventListener(event, _this.update);
         });
+        window.addEventListener('scroll', function (ev) {
+            // Update bounds
+            _this.wheelBounds = _this.wheel.getBoundingClientRect();
+            _this.handleBounds = _this.handle.getBoundingClientRect();
+        });
     }
     Slider.prototype.insertWheel = function (radius) {
         this.container.insertAdjacentHTML('beforeend', this.wheelTemplate);
@@ -143,15 +148,16 @@ var Slider = (function () {
         };
     };
     Slider.prototype.isClickWithinClientRect = function (ev, rect) {
+        console.log(ev, rect);
         var evParsed = this.handleMouseTouch(ev);
-        var xWithin = rect.left <= evParsed.pageX && evParsed.pageX <= (rect.left + rect.width);
-        var yWithin = rect.top <= evParsed.pageY && evParsed.pageY <= (rect.top + rect.height);
+        var xWithin = (window.pageXOffset + rect.left) <= evParsed.pageX && evParsed.pageX <= (window.pageXOffset + rect.left + rect.width);
+        var yWithin = (window.pageYOffset + rect.top) <= evParsed.pageY && evParsed.pageY <= (window.pageYOffset + rect.top + rect.height);
         return xWithin && yWithin;
     };
     Slider.prototype.isClickInWheelArc = function (ev, wheel) {
         var evParsed = this.handleMouseTouch(ev);
-        var dX = evParsed.pageX - wheel.wheelBounds.left - wheel.wheelBounds.width / 2;
-        var dY = evParsed.pageY - wheel.wheelBounds.top - wheel.wheelBounds.height / 2;
+        var dX = evParsed.pageX - (window.pageXOffset + wheel.wheelBounds.left) - wheel.wheelBounds.width / 2;
+        var dY = evParsed.pageY - (window.pageYOffset + wheel.wheelBounds.top) - wheel.wheelBounds.height / 2;
         var fromCenter = Math.sqrt(dX * dX + dY * dY);
         return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20);
     };
