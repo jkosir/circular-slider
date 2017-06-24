@@ -13,6 +13,8 @@ class Slider {
   arc: HTMLElement;
   options: Options;
   mousedown: boolean;
+  value: number;
+  onChange: Function;
   wheelBounds: ClientRect;
   handleBounds: ClientRect;
   wheelId = `wheel_${document.getElementsByClassName("wheel").length}`;
@@ -31,7 +33,7 @@ class Slider {
     <a href="javascript:void(0)" class="wheel-handle"></a>
   </div>`;
 
-  constructor({container, color = '#ff0000', max = 100, min = 0, step = 1, radius = 100}:{container: HTMLElement, color?: string, max?: number, min?: number, step?: number, radius?: number}) {
+  constructor({container, color = '#ff0000', max = 100, min = 0, step = 1, radius = 100, onChange}:{container: HTMLElement, color?: string, max?: number, min?: number, step?: number, radius?: number, onChange?: Function}) {
     this.options = {
       color: color,
       max: max,
@@ -39,6 +41,8 @@ class Slider {
       step: step,
       radius: radius
     };
+    this.value = min;
+    this.onChange = onChange;
 
     this.mousedown = false;
     this.container = container;
@@ -132,6 +136,17 @@ class Slider {
       0,
       deg
     ));
+
+    // Calculate new value
+    let newValue = deg * (this.options.max - this.options.min) / 360;
+    let rounded = Math.ceil(newValue / this.options.step) * this.options.step;
+    if (Math.abs(rounded - this.value) >= this.options.step) {
+      this.value = rounded;
+      if (typeof this.onChange === 'function') {
+        this.onChange(rounded);
+      }
+    }
+
     // Update bounds
     this.wheelBounds = this.wheel.getBoundingClientRect();
     this.handleBounds = this.handle.getBoundingClientRect();
