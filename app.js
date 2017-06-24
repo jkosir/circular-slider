@@ -150,8 +150,8 @@ var Slider = (function () {
     Slider.prototype.isClickWithinClientRect = function (ev, rect) {
         console.log(ev, rect);
         var evParsed = this.handleMouseTouch(ev);
-        var xWithin = (window.pageXOffset + rect.left) <= evParsed.pageX && evParsed.pageX <= (window.pageXOffset + rect.left + rect.width);
-        var yWithin = (window.pageYOffset + rect.top) <= evParsed.pageY && evParsed.pageY <= (window.pageYOffset + rect.top + rect.height);
+        var xWithin = (rect.left) <= evParsed.pageX && evParsed.pageX <= (rect.left + rect.width);
+        var yWithin = (rect.top) <= evParsed.pageY && evParsed.pageY <= (rect.top + rect.height);
         return xWithin && yWithin;
     };
     Slider.prototype.isClickInWheelArc = function (ev, wheel) {
