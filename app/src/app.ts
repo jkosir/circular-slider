@@ -50,34 +50,44 @@ class Slider {
     Slider.wheelsRegistry.push(this);
 
     // Window listeners, so we can dispatch events correctly
-    window.addEventListener('mousedown', (ev: MouseEvent) => {
-      for (let wheel of Slider.wheelsRegistry) {
-        if (this.isClickWithinClientRect(ev, wheel.handleBounds)) {
-          wheel.handle.dispatchEvent(new Event('mousedown'));
-          ev.stopPropagation();
+    ['mousedown', 'touchstart'].forEach((event) => {
+      window.addEventListener(event, (ev: MouseEvent) => {
+        for (let wheel of Slider.wheelsRegistry) {
+          if (this.isClickWithinClientRect(ev, wheel.handleBounds)) {
+            wheel.handle.dispatchEvent(new Event('mousedown'));
+            ev.stopPropagation();
+          }
         }
-      }
+      });
     });
 
-    window.addEventListener('click', (ev: MouseEvent) => {
-      for (let wheel of Slider.wheelsRegistry) {
-        if (this.isClickInWheelArc(ev, wheel)) {
-          wheel.mousedown = true;
-          wheel.update(ev);
-          wheel.mousedown = false;
-          ev.stopPropagation();
+    ['click', 'touch'].forEach((event) => {
+      window.addEventListener(event, (ev: MouseEvent) => {
+        for (let wheel of Slider.wheelsRegistry) {
+          if (this.isClickInWheelArc(ev, wheel)) {
+            wheel.mousedown = true;
+            wheel.update(ev);
+            wheel.mousedown = false;
+            ev.stopPropagation();
+          }
         }
-      }
+      })
     });
 
     /* Set listeners */
-    this.handle.addEventListener('mousedown', (ev) => {
-      this.mousedown = true;
-      ev.preventDefault();
-      this.handle.focus();
+    ['mousedown', 'touchstart'].forEach((event) => {
+      this.handle.addEventListener(event, (ev) => {
+        this.mousedown = true;
+        ev.preventDefault();
+        this.handle.focus();
+      });
     });
-    window.addEventListener('mouseup', () => this.mousedown = false);
-    window.addEventListener('mousemove', this.update);
+    ['mouseup', 'touchend'].forEach((event) => {
+      window.addEventListener(event, () => this.mousedown = false);
+    });
+    ['mousemove', 'touchmove'].forEach((event) => {
+      window.addEventListener(event, this.update);
+    });
   }
 
   insertWheel(radius) {
