@@ -99,6 +99,8 @@ class Slider {
     this.container.insertAdjacentHTML('beforeend', this.wheelTemplate);
 
     this.wheel = document.getElementById(this.wheelId);
+    // Required for iOS to register click events
+    this.wheel.onclick = () => undefined;
     this.wheel.style.width = `${2 * radius}px`;
     this.wheel.style.height = `${2 * radius}px`;
     this.wheel.style.borderRadius = `${radius}px`;
