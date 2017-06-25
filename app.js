@@ -148,9 +148,10 @@ var Slider = (function () {
         };
     };
     Slider.prototype.isClickWithinClientRect = function (ev, rect) {
+        console.log(ev, rect);
         var evParsed = this.handleMouseTouch(ev);
-        var xWithin = (rect.left) <= evParsed.pageX && evParsed.pageX <= (rect.left + rect.width);
-        var yWithin = (rect.top) <= evParsed.pageY && evParsed.pageY <= (rect.top + rect.height);
+        var xWithin = (window.pageXOffset + rect.left) <= evParsed.pageX && evParsed.pageX <= (window.pageXOffset + rect.left + rect.width);
+        var yWithin = (window.pageYOffset + rect.top) <= evParsed.pageY && evParsed.pageY <= (window.pageYOffset + rect.top + rect.height);
         return xWithin && yWithin;
     };
     Slider.prototype.isClickInWheelArc = function (ev, wheel) {
@@ -158,7 +159,6 @@ var Slider = (function () {
         var dX = evParsed.pageX - (window.pageXOffset + wheel.wheelBounds.left) - wheel.wheelBounds.width / 2;
         var dY = evParsed.pageY - (window.pageYOffset + wheel.wheelBounds.top) - wheel.wheelBounds.height / 2;
         var fromCenter = Math.sqrt(dX * dX + dY * dY);
-        console.log(evParsed, dX, dY, fromCenter);
         return fromCenter < wheel.options.radius && fromCenter > (wheel.options.radius - 20);
     };
     // Ref: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
