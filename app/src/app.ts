@@ -100,7 +100,9 @@ class Slider {
 
     this.wheel = document.getElementById(this.wheelId);
     // Required for iOS to register click events
-    this.wheel.onclick = () => undefined;
+    // Only do it on iOS, otherwise it breaks Android functionality
+    let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (iOS) this.wheel.onclick = () => undefined;
     this.wheel.style.width = `${2 * radius}px`;
     this.wheel.style.height = `${2 * radius}px`;
     this.wheel.style.borderRadius = `${radius}px`;
